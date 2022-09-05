@@ -1,71 +1,52 @@
-const counterElement = document.getElementById("counter")
-const pauseButton = document.getElementById("pause")
-const plusButton = document.getElementById("plus")
-const minusButton = document.getElementById("minus")
-const likesButton = document.getElementById("heart")
-const counterLikesList = document.querySelector("ul.likes")
-const commentForm = document.getElementById("comment-form")
-const commentsList = document.getElementById("List")
-const counterLikes = {}
+const counter = document.getElementById("counter");
+const minus = document.getElementById("minus");
+const plus = document.getElementById("plus");
+const heart = document.getElementById("heart");
+const pause = document.getElementById("pause");
+const form = document.getElementById("comment-form");
+const comments = document.createElement("ul");
+document.getElementById("list").append(comments);
 
-document.addEventListener("DOMContentLoaded",() =>{
-    startIncrementingCounter()
-    plusButton.addEventListener("click",incrementCounter)
-    minusButton.addEventListener("click",decrementCounter)
-    likesButton.addEventListener("click",heartClick)
-    pauseButton.addEventListener("click",pauseCounter)
-    commentForm.addEventListener("submit",submitComment)
-})
-// counterpaused
-let isCounterRunning = () => {
-    return pauseButton.innerText ==="pause"? true:false
-}
-// startIncrementingCounter
-let startIncrementingCounter = () =>{
-    setInterval(incrementCounter,1000)
-}
-// increment new value
-let incrementCounter = ()=>{
-    if (isCounterRunning()){
-        counterElement.innerText = parseInt(counterElement.innerText)+1
-    }
+let i = 0;
+let active = false;
+let timer = createTimer();
 
+function createTimer() {
+  active = true;
+  return setInterval(() => {
+    i += 1;
+    counter.innerText = i;
+  }, 1000);
 }
-// decrementCounter value
-let decrementCounter = () =>{
-    if(isCounterRunning()){
-        counterElement.innerText = parseInt(counterElement.innerText)-1
-    }
-}
-let heartClick = () =>{
-    let counter = parseInt(counterElement.innerText)
-    counterLikes[counter]
-    ?(counterLikes[counter] +=1)
-    : (counterLikes[counter] = 1)
-  if (document.getElementById(`like-${counter}`)) {
-    document.getElementById(
-      `like-${counter}`
-    ).innerText = `${counter} was liked ${counterLikes[counter]} times`
-  } else {
-    const li = document.createElement('li')
-    li.id = `like-${counter}`
-    li.innerText = `${counter} was liked 1 time`
-    counterLikesList.appendChild(li)
+
+pause.addEventListener("click", () => {
+  if (active) {
+    clearInterval(timer);
+    active = false;
+  } else if (!active) {
+    timer = createTimer();
   }
-}
-// pause
-let pauseCounter = () =>{
-    pauseButton.innerText = pauseButton.innerText ==="pause"? "resume":"pause"
-    const button = [plusButton,minusButton,likesButton]
-    button.forEach((button)=>{
-        button.disabled = !button.disabled
-    })
-}
-// list of user commentsList
+});
+minus.addEventListener("click", () => {
+  i -= 1;
+  counter.innerText = i;
+});
+plus.addEventListener("click", () => {
+  i += 1;
+  counter.innerText = i;
+});
 
-let submitComment = (e) => {
-    e.preventDefault()
-    let comment= document.getElementById("comment-input").value
-    commentsList.innerHTML += `<p>${comment}</p>`
-    commentForm.reset()
-}
+heart.addEventListener("click", () => {
+  const lis = document.createElement("li");
+  lis.textContent = `${i} has one like`;
+  document.querySelector(".likes").append(lis);
+});
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const input = e.target.children[0];
+  const li = document.createElement("li");
+  li.textContent = input.value;
+  comments.append(li);
+  input.value = "";
+});
